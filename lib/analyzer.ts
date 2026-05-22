@@ -131,16 +131,28 @@ function getSlug(url: string): string {
   }
 }
 
+interface AnalysisCallbacks {
+  onLog?: (message: string) => void;
+}
+
 async function analyzeSingleUrl(
   url: string,
   timestamp: string,
   screenshotDir: string,
-  authCookies: CookieSpec[]
+  authCookies: CookieSpec[],
+  callbacks?: AnalysisCallbacks
 ): Promise<AnalysisResult> {
+  const log = (msg: string) => {
+    console.log(msg);
+    callbacks?.onLog?.(msg);
+  };
+
   const slug = getSlug(url);
   const screenshotFileName = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${slug}.png`;
   const screenshotFilePath = path.join(screenshotDir, screenshotFileName);
   const publicPath = `/screenshots/${screenshotFileName}`;
+
+  log(`[Analyzer] Starting analysis for ${slug} (${url})`);
 
   const browser = await chromium.launch({ headless: true });
 
@@ -159,7 +171,7 @@ async function analyzeSingleUrl(
         sameSite: 'Lax' as const,
       }));
 
-      console.log(`[Playwright] Setting ${playwrightCookies.length} cookies for domain ${cookieDomain}`);
+      log(`[Playwright] Setting ${playwrightCookies.length} cookies for domain ${cookieDomain}`);
       await context.addCookies(playwrightCookies);
     }
 
@@ -168,7 +180,7 @@ async function analyzeSingleUrl(
     // Capture browser console logs
     page.on('console', (msg) => {
       if (msg.text().includes('[Wrapper]') || msg.text().includes('[Analyzer]')) {
-        console.log(`[Browser] ${msg.text()}`);
+        log(`[Browser] ${msg.text()}`);
       }
     });
 
@@ -187,12 +199,12 @@ async function analyzeSingleUrl(
       // In standalone mode, window.parent === window, so postMessage from CMS
       // will be dispatched on this page's window itself
       await page.goto(url, { waitUntil: 'load', timeout: 60000 });
-      console.log(`[Analyzer] Page load event reached for ${url}`);
+      log(`[Analyzer] Page load event reached for ${slug}`);
 
       // Wait for CMS content to send LOAD_COMPLETE postMessage (max 3s)
       // CMS contents in iframe do: window.parent.postMessage({ type: 'LOAD_COMPLETE' }, '*')
       // In standalone page, this usually doesn't fire because parent === self
-      console.log(`[Analyzer] Waiting for LOAD_COMPLETE from CMS (max 3s)...`);
+      log(`[Analyzer] Waiting for LOAD_COMPLETE from CMS (max 3s)...`);
       const loadCompleteResult = await page.evaluate(() => {
         return new Promise<{ received: boolean }>((resolve) => {
           const handler = (event: MessageEvent) => {
@@ -215,9 +227,9 @@ async function analyzeSingleUrl(
       const loadTime = (endTime - startTime) / 1000;
 
       if (loadCompleteResult.received) {
-        console.log(`[Analyzer] LOAD_COMPLETE received for ${url} (total ${loadTime.toFixed(1)}s)`);
+        log(`[Analyzer] LOAD_COMPLETE received for ${slug} (total ${loadTime.toFixed(1)}s)`);
       } else {
-        console.warn(`[Analyzer] LOAD_COMPLETE not received for ${url}, using fallback (total ${loadTime.toFixed(1)}s)`);
+        log(`[Analyzer] LOAD_COMPLETE not received for ${slug}, using fallback (total ${loadTime.toFixed(1)}s)`);
         // Fallback: wait additional time for JS rendering
         await page.waitForTimeout(1500);
       }
@@ -239,7 +251,7 @@ async function analyzeSingleUrl(
 
       // Screenshot (full page)
       await page.screenshot({ path: screenshotFilePath, fullPage: true });
-      console.log(`[Analyzer] Screenshot saved for ${url} (loadTime: ${loadTime.toFixed(1)}s)`);
+      log(`[Analyzer] Screenshot saved for ${slug} (loadTime: ${loadTime.toFixed(1)}s, memory: ${memoryMB.toFixed(1)}MB, size: ${sizeMB.toFixed(1)}MB)`);
 
       return {
         url,
@@ -253,6 +265,7 @@ async function analyzeSingleUrl(
         analyzedAt: timestamp,
       };
     } catch (err: any) {
+      log(`[Analyzer] Error analyzing ${slug}: ${err.message}`);
       return {
         url,
         slug,
@@ -274,7 +287,16 @@ async function analyzeSingleUrl(
   }
 }
 
-export async function analyzeUrls(urls: string[]): Promise<AnalysisResult[]> {
+interface AnalyzeUrlsCallbacks {
+  onLog?: (message: string) => void;
+  onResult?: (result: AnalysisResult) => void;
+  onProgress?: (current: number, total: number) => void;
+}
+
+export async function analyzeUrls(
+  urls: string[],
+  callbacks?: AnalyzeUrlsCallbacks
+): Promise<AnalysisResult[]> {
   const timestamp = new Date().toISOString();
   const screenshotDir = await ensureScreenshotsDir();
 
@@ -284,9 +306,19 @@ export async function analyzeUrls(urls: string[]): Promise<AnalysisResult[]> {
   const authCookies = await getAuthCookies(targetCdnDomain);
 
   const limit = pLimit(CONCURRENCY);
+  const total = urls.length;
+  let completed = 0;
 
   const results = await Promise.all(
-    urls.map((url) => limit(() => analyzeSingleUrl(url, timestamp, screenshotDir, authCookies)))
+    urls.map((url) =>
+      limit(async () => {
+        const result = await analyzeSingleUrl(url, timestamp, screenshotDir, authCookies, callbacks);
+        completed++;
+        callbacks?.onResult?.(result);
+        callbacks?.onProgress?.(completed, total);
+        return result;
+      })
+    )
   );
 
   return results;

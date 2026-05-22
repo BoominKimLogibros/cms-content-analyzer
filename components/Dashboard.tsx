@@ -23,6 +23,12 @@ export default function Dashboard() {
   const [showUrlList, setShowUrlList] = useState(false);
   const [randomCount, setRandomCount] = useState<number>(10);
 
+  // Streaming analysis state
+  const [progress, setProgress] = useState<{ current: number; total: number; percentage: number } | null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [eta, setEta] = useState<string>('');
+  const [streamingResults, setStreamingResults] = useState<AnalysisResult[]>([]);
+
   const checkedItems = useMemo(() => urlItems.filter((u) => u.checked), [urlItems]);
   const checkedCount = checkedItems.length;
   const totalCount = urlItems.length;
@@ -132,21 +138,113 @@ export default function Dashboard() {
 
     setLoadingAnalyze(true);
     setMessage('');
+    setProgress(null);
+    setLogs([]);
+    setEta('');
+    setStreamingResults([]);
+
+    const startTime = Date.now();
+    const urls = checkedItems.map((u) => u.url);
+
     try {
-      const urls = checkedItems.map((u) => u.url);
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ urls }),
       });
-      const data: AnalyzeResponse = await res.json();
-      if (data.success) {
-        setResults(data.results);
-        setMessage(
-          `${data.totalCount}개 분석 완료 (성공 ${data.successCount}개, 실패 ${data.failCount}개)`
-        );
-      } else {
-        setMessage(`분석 실패: ${data.message}`);
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${res.status}`);
+      }
+
+      if (!res.body) {
+        throw new Error('No response body');
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Parse SSE messages (separated by double newline)
+        const messages = buffer.split('\n\n');
+        buffer = messages.pop() || '';
+
+        for (const msg of messages) {
+          if (!msg.trim()) continue;
+
+          const lines = msg.split('\n');
+          let eventType = '';
+          let dataStr = '';
+
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.slice(7).trim();
+            } else if (line.startsWith('data: ')) {
+              dataStr = line.slice(6).trim();
+            }
+          }
+
+          if (!eventType || !dataStr) continue;
+
+          try {
+            const data = JSON.parse(dataStr);
+
+            switch (eventType) {
+              case 'log': {
+                setLogs((prev) => [...prev, data.message]);
+                break;
+              }
+              case 'progress': {
+                setProgress({
+                  current: data.current,
+                  total: data.total,
+                  percentage: data.percentage,
+                });
+                // Calculate ETA
+                const elapsed = (Date.now() - startTime) / 1000;
+                const avgPerItem = elapsed / data.current;
+                const remaining = avgPerItem * (data.total - data.current);
+                if (remaining > 60) {
+                  const mins = Math.floor(remaining / 60);
+                  const secs = Math.round(remaining % 60);
+                  setEta(`${mins}분 ${secs}초 남음`);
+                } else {
+                  setEta(`${Math.round(remaining)}초 남음`);
+                }
+                break;
+              }
+              case 'result': {
+                // Individual result if needed
+                break;
+              }
+              case 'complete': {
+                setResults(data.results);
+                setStreamingResults(data.results);
+                setMessage(
+                  `${data.totalCount}개 분석 완료 (성공 ${data.successCount}개, 실패 ${data.failCount}개)`
+                );
+                setEta('');
+                setProgress(null);
+                break;
+              }
+              case 'error': {
+                setMessage(`분석 오류: ${data.message}`);
+                setEta('');
+                setProgress(null);
+                break;
+              }
+            }
+          } catch {
+            // ignore parse errors
+          }
+        }
       }
     } catch (err: any) {
       setMessage(`분석 오류: ${err.message}`);
@@ -219,6 +317,50 @@ export default function Dashboard() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           {message}
+        </div>
+      )}
+
+      {/* Analysis Progress */}
+      {loadingAnalyze && progress && (
+        <div className="mb-6 p-5 bg-gray-900 rounded-xl text-white shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span className="font-semibold text-sm">분석 진행 중...</span>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-bold tabular-nums">{progress.percentage}%</span>
+              <span className="text-xs text-gray-400 ml-2">({progress.current} / {progress.total}개)</span>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden mb-3">
+            <div
+              className="h-full bg-emerald-500 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress.percentage}%` }}
+            />
+          </div>
+
+          {/* ETA */}
+          {eta && (
+            <div className="text-xs text-gray-400 mb-3">
+              예상 남은 시간: <span className="text-emerald-400 font-medium">{eta}</span>
+            </div>
+          )}
+
+          {/* Log Window */}
+          <div className="bg-black/50 rounded-lg p-3 max-h-48 overflow-y-auto font-mono text-xs space-y-1">
+            {logs.length === 0 && (
+              <span className="text-gray-500">로그 수신 중...</span>
+            )}
+            {logs.map((log, i) => (
+              <div key={i} className="text-gray-300 break-all">
+                <span className="text-gray-500 mr-1">{i + 1}.</span>
+                {log}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
