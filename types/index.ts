@@ -16,6 +16,9 @@ export interface AnalysisResult {
   memoryGrade: Grade;
   sizeGrade: Grade;
   priorityScore: number; // 0~9, higher = more urgent to improve
+
+  // Per-URL analysis logs (server-side logs from Playwright)
+  logs?: string[];
 }
 
 export interface UrlItem {

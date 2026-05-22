@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { analyzeUrls } from '@/lib/analyzer';
 import { calculateScores, sortByPriority } from '@/lib/scoring';
-import { saveResults } from '@/lib/storage';
+import { saveResults, loadResults } from '@/lib/storage';
 import { AnalyzePayload, AnalysisResult } from '@/types';
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -86,14 +86,28 @@ export async function POST(request: NextRequest): Promise<Response> {
         const scored = calculateScores(analyzedResults);
         const sorted = sortByPriority(scored);
 
-        await saveResults(sorted);
+        // If single URL, merge into existing results instead of overwriting everything
+        let finalResults = sorted;
+        if (urls.length === 1) {
+          const existing = await loadResults();
+          const url = urls[0];
+          const idx = existing.findIndex((r) => r.url === url);
+          if (idx >= 0) {
+            existing[idx] = sorted[0];
+          } else {
+            existing.push(sorted[0]);
+          }
+          finalResults = sortByPriority(calculateScores(existing));
+        }
 
-        const successCount = sorted.filter((r) => r.status === 'success').length;
-        const failCount = sorted.filter((r) => r.status === 'error').length;
+        await saveResults(finalResults);
+
+        const successCount = finalResults.filter((r) => r.status === 'success').length;
+        const failCount = finalResults.filter((r) => r.status === 'error').length;
 
         sendSSE(controller, 'complete', {
-          results: sorted,
-          totalCount: sorted.length,
+          results: finalResults,
+          totalCount: finalResults.length,
           successCount,
           failCount,
         });

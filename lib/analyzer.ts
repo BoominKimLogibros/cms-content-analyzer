@@ -142,8 +142,10 @@ async function analyzeSingleUrl(
   authCookies: CookieSpec[],
   callbacks?: AnalysisCallbacks
 ): Promise<AnalysisResult> {
+  const urlLogs: string[] = [];
   const log = (msg: string) => {
     console.log(msg);
+    urlLogs.push(msg);
     callbacks?.onLog?.(msg);
   };
 
@@ -189,7 +191,10 @@ async function analyzeSingleUrl(
       const client = await page.context().newCDPSession(page);
       await client.send('Network.enable');
       let totalEncodedLength = 0;
+
+      let sizeCaptured = false;
       client.on('Network.loadingFinished', (params: { encodedDataLength: number }) => {
+        if (sizeCaptured) return;
         totalEncodedLength += params.encodedDataLength;
       });
 
@@ -234,6 +239,13 @@ async function analyzeSingleUrl(
         await page.waitForTimeout(1500);
       }
 
+      // ── FIX: capture network size at load time, BEFORE fullPage screenshot triggers lazy-image loads ──
+      // fullPage=true screenshot scrolls to the bottom and forces lazy images to download,
+      // inflating the total. We freeze the count right after the page load completes.
+      await page.waitForTimeout(500);
+      sizeCaptured = true;
+      const sizeAtLoad = totalEncodedLength;
+
       // Memory (Chromium specific)
       const memoryUsed = await page.evaluate(() => {
         try {
@@ -246,8 +258,8 @@ async function analyzeSingleUrl(
       });
       const memoryMB = memoryUsed / (1024 * 1024);
 
-      // Size: encodedDataLength from CDP is already in bytes
-      const sizeMB = totalEncodedLength / (1024 * 1024);
+      // Size: use the captured-at-load value, not the post-screenshot accumulated value
+      const sizeMB = sizeAtLoad / (1024 * 1024);
 
       // Screenshot (full page)
       await page.screenshot({ path: screenshotFilePath, fullPage: true });
@@ -267,6 +279,7 @@ async function analyzeSingleUrl(
         memoryGrade: 'good' as const,
         sizeGrade: 'good' as const,
         priorityScore: 0,
+        logs: urlLogs,
       };
     } catch (err: any) {
       log(`[Analyzer] Error analyzing ${slug}: ${err.message}`);
@@ -284,6 +297,7 @@ async function analyzeSingleUrl(
         memoryGrade: 'critical' as const,
         sizeGrade: 'critical' as const,
         priorityScore: 9,
+        logs: urlLogs,
       };
     } finally {
       await page.close();

@@ -30,6 +30,14 @@ export default function Dashboard() {
   const [eta, setEta] = useState<string>('');
   const [streamingResults, setStreamingResults] = useState<AnalysisResult[]>([]);
 
+  // Per-row re-analysis state
+  const [reanalyzingUrls, setReanalyzingUrls] = useState<Set<string>>(new Set());
+  const [logModal, setLogModal] = useState<{ open: boolean; title: string; logs: string[] }>({
+    open: false,
+    title: '',
+    logs: [],
+  });
+
   const checkedItems = useMemo(() => urlItems.filter((u) => u.checked), [urlItems]);
   const checkedCount = checkedItems.length;
   const totalCount = urlItems.length;
@@ -251,6 +259,71 @@ export default function Dashboard() {
       setMessage(`분석 오류: ${err.message}`);
     } finally {
       setLoadingAnalyze(false);
+    }
+  }
+
+  async function handleReanalyze(url: string) {
+    setReanalyzingUrls((prev) => new Set(prev).add(url));
+    setMessage('');
+
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls: [url] }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${res.status}`);
+      }
+
+      if (!res.body) throw new Error('No response body');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const messages = buffer.split('\n\n');
+        buffer = messages.pop() || '';
+
+        for (const msg of messages) {
+          if (!msg.trim()) continue;
+          const lines = msg.split('\n');
+          let eventType = '';
+          let dataStr = '';
+          for (const line of lines) {
+            if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+            else if (line.startsWith('data: ')) dataStr = line.slice(6).trim();
+          }
+          if (!eventType || !dataStr) continue;
+
+          try {
+            const data = JSON.parse(dataStr);
+            if (eventType === 'complete') {
+              setResults(data.results);
+              setMessage(`"${url.split('/').pop()}" 재분석 완료`);
+            } else if (eventType === 'error') {
+              setMessage(`재분석 오류: ${data.message}`);
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    } catch (err: any) {
+      setMessage(`재분석 오류: ${err.message}`);
+    } finally {
+      setReanalyzingUrls((prev) => {
+        const next = new Set(prev);
+        next.delete(url);
+        return next;
+      });
     }
   }
 
@@ -498,6 +571,7 @@ export default function Dashboard() {
                   <th className="py-3 px-3 text-center whitespace-nowrap w-24" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급.">개선 필요도</th>
                   <th className="py-3 px-3 text-center whitespace-nowrap w-20">상태</th>
                   <th className="py-3 px-3 text-center whitespace-nowrap w-28">스크린샷</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-24">액션</th>
                 </tr>
               </thead>
               <tbody>
@@ -613,6 +687,40 @@ export default function Dashboard() {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
+
+                    {/* Actions */}
+                    <td className="py-3 px-3 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => handleReanalyze(r.url)}
+                          disabled={reanalyzingUrls.has(r.url)}
+                          title="다시 측정"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {reanalyzingUrls.has(r.url) ? (
+                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          )}
+                        </button>
+                        {r.logs && r.logs.length > 0 && (
+                          <button
+                            onClick={() => setLogModal({ open: true, title: r.slug, logs: r.logs || [] })}
+                            title="분석 로그 보기"
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -621,7 +729,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Screenshot Modal */}
       {modalImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
@@ -640,6 +748,44 @@ export default function Dashboard() {
             >
               &times;
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Log Drawer */}
+      {logModal.open && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex justify-end"
+          onClick={() => setLogModal({ open: false, title: '', logs: [] })}
+        >
+          <div
+            className="w-full max-w-lg h-full bg-white shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">분석 로그</h3>
+                <p className="text-sm text-gray-500">{logModal.title}</p>
+              </div>
+              <button
+                onClick={() => setLogModal({ open: false, title: '', logs: [] })}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="bg-gray-900 rounded-lg p-4 font-mono text-xs space-y-1.5">
+                {logModal.logs.map((log, i) => (
+                  <div key={i} className="text-gray-300 break-all">
+                    <span className="text-gray-500 mr-2 tabular-nums">{String(i + 1).padStart(3, '0')}</span>
+                    {log}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
