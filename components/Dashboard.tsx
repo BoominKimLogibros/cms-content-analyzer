@@ -346,13 +346,13 @@ export default function Dashboard() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                  <th className="py-3 px-4">우선순위</th>
+                  <th className="py-3 px-4" title="개선이 시급한 순서 (점수 낮은 순)">우선순위</th>
                   <th className="py-3 px-4">파일명</th>
                   <th className="py-3 px-4">URL</th>
-                  <th className="py-3 px-4">로딩 시간</th>
-                  <th className="py-3 px-4">JS 메모리 사용량</th>
-                  <th className="py-3 px-4">리소스 다운로드 크기</th>
-                  <th className="py-3 px-4">성능 점수</th>
+                  <th className="py-3 px-4" title="페이지 로드 이벤트부터 LOAD_COMPLETE(또는 폴백)까지 걸린 시간">로딩 시간</th>
+                  <th className="py-3 px-4" title="Chromium V8 JS Heap 사용량 (performance.memory.usedJSHeapSize). 브라우저 전체 Heap이므로 컨텐츠 간 차이가 적을 수 있습니다.">JS 메모리 사용량</th>
+                  <th className="py-3 px-4" title="CDP Network.loadingFinished의 encodedDataLength 합계. 페이지 로드 중 전송된 모든 리소스의 누적 바이트입니다.">리소스 다운로드 크기</th>
+                  <th className="py-3 px-4" title="로딩 시간 / 메모리 / 다운로드 크기를 동일 비중으로 정규화한 평균 (0~100). 낮을수록 개선 필요.">성능 점수</th>
                   <th className="py-3 px-4">상태</th>
                   <th className="py-3 px-4">스크린샷</th>
                 </tr>

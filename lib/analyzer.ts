@@ -234,9 +234,8 @@ async function analyzeSingleUrl(
       });
       const memoryMB = memoryUsed / (1024 * 1024);
 
-      // Size: encodedDataLength from CDP is base64 length, multiply by 0.75 for approx bytes
-      const sizeBytes = totalEncodedLength * 0.75;
-      const sizeMB = sizeBytes / (1024 * 1024);
+      // Size: encodedDataLength from CDP is already in bytes
+      const sizeMB = totalEncodedLength / (1024 * 1024);
 
       // Screenshot (full page)
       await page.screenshot({ path: screenshotFilePath, fullPage: true });
