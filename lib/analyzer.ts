@@ -260,9 +260,13 @@ async function analyzeSingleUrl(
         memory: memoryMB,
         size: sizeMB,
         screenshotPath: publicPath,
-        score: 0,
         status: 'success',
         analyzedAt: timestamp,
+        // Grades are calculated later by scoring.ts
+        loadTimeGrade: 'good' as const,
+        memoryGrade: 'good' as const,
+        sizeGrade: 'good' as const,
+        priorityScore: 0,
       };
     } catch (err: any) {
       log(`[Analyzer] Error analyzing ${slug}: ${err.message}`);
@@ -273,10 +277,13 @@ async function analyzeSingleUrl(
         memory: 0,
         size: 0,
         screenshotPath: '',
-        score: 0,
         status: 'error',
         errorMessage: err.message,
         analyzedAt: timestamp,
+        loadTimeGrade: 'critical' as const,
+        memoryGrade: 'critical' as const,
+        sizeGrade: 'critical' as const,
+        priorityScore: 9,
       };
     } finally {
       await page.close();

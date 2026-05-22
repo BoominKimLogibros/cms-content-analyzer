@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { AnalysisResult, UrlItem, UrlListResponse, AnalyzeResponse } from '@/types';
+import { getGradeEmoji, getGradeLabel, getGradeColorClass, getPriorityColorClass } from '@/lib/scoring';
 
 function estimateDuration(urlCount: number): string {
   if (urlCount <= 0) return '0초';
@@ -488,13 +489,13 @@ export default function Dashboard() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                  <th className="py-3 px-4" title="개선이 시급한 순서 (점수 낮은 순)">우선순위</th>
+                  <th className="py-3 px-4" title="개선이 시급한 순서 (개선 필요도 높은 순)">우선순위</th>
                   <th className="py-3 px-4">파일명</th>
                   <th className="py-3 px-4">URL</th>
-                  <th className="py-3 px-4" title="페이지 로드 이벤트부터 LOAD_COMPLETE(또는 폴백)까지 걸린 시간">로딩 시간</th>
-                  <th className="py-3 px-4" title="Chromium V8 JS Heap 사용량 (performance.memory.usedJSHeapSize). 브라우저 전체 Heap이므로 컨텐츠 간 차이가 적을 수 있습니다.">JS 메모리 사용량</th>
-                  <th className="py-3 px-4" title="CDP Network.loadingFinished의 encodedDataLength 합계. 페이지 로드 중 전송된 모든 리소스의 누적 바이트입니다.">리소스 다운로드 크기</th>
-                  <th className="py-3 px-4" title="로딩 시간 / 메모리 / 다운로드 크기를 동일 비중으로 정규화한 평균 (0~100). 낮을수록 개선 필요.">성능 점수</th>
+                  <th className="py-3 px-4" title="🟢 쾌적: ≤1.8초 / 🟡 중간: 1.8~3.0초 / 🟠 나쁨: 3.0~5.5초 / 🔴 매우 나쁨: >5.5초">로딩 시간</th>
+                  <th className="py-3 px-4" title="🟢 쾌적: ≤50MB / 🟡 중간: 50~100MB / 🟠 나쁨: 100~150MB / 🔴 매우 나쁨: >150MB. 브라우저 전체 V8 Heap이므로 컨텐츠 간 차이가 적을 수 있습니다.">JS 메모리 사용량</th>
+                  <th className="py-3 px-4" title="🟢 쾌적: ≤1.5MB / 🟡 중간: 1.5~3.5MB / 🟠 나쁨: 3.5~6.0MB / 🔴 매우 나쁨: >6.0MB. 페이지 로드 중 전송된 모든 리소스의 누적 바이트입니다.">리소스 다운로드 크기</th>
+                  <th className="py-3 px-4" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급. good=0, moderate=1, poor=2, critical=3.">개선 필요도</th>
                   <th className="py-3 px-4">상태</th>
                   <th className="py-3 px-4">스크린샷</th>
                 </tr>
@@ -515,22 +516,49 @@ export default function Dashboard() {
                         {r.url}
                       </a>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 tabular-nums">
-                      {r.status === 'success' ? `${r.loadTime.toFixed(2)}초` : '-'}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 tabular-nums">
-                      {r.status === 'success' ? `${r.memory.toFixed(1)} MB` : '-'}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 tabular-nums">
-                      {r.status === 'success' ? `${r.size.toFixed(1)} MB` : '-'}
-                    </td>
-                    <td className="py-3 px-4 text-sm font-bold tabular-nums">
+                    <td className="py-3 px-4">
                       {r.status === 'success' ? (
-                        <span className={r.score < 50 ? 'text-red-600' : r.score < 75 ? 'text-amber-600' : 'text-emerald-600'}>
-                          {r.score.toFixed(1)}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 tabular-nums">{r.loadTime.toFixed(2)}초</span>
+                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.loadTimeGrade)}`}>
+                            {getGradeEmoji(r.loadTimeGrade)} {getGradeLabel(r.loadTimeGrade)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {r.status === 'success' ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 tabular-nums">{r.memory.toFixed(1)} MB</span>
+                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.memoryGrade)}`}>
+                            {getGradeEmoji(r.memoryGrade)} {getGradeLabel(r.memoryGrade)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {r.status === 'success' ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 tabular-nums">{r.size.toFixed(1)} MB</span>
+                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.sizeGrade)}`}>
+                            {getGradeEmoji(r.sizeGrade)} {getGradeLabel(r.sizeGrade)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-sm">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {r.status === 'success' ? (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold tabular-nums ${getPriorityColorClass(r.priorityScore)}`}>
+                          {r.priorityScore}점
                         </span>
                       ) : (
-                        '-'
+                        <span className="text-gray-400 text-sm">-</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-sm">

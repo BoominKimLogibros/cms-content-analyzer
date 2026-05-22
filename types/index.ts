@@ -1,3 +1,5 @@
+export type Grade = 'good' | 'moderate' | 'poor' | 'critical';
+
 export interface AnalysisResult {
   url: string;
   slug: string;
@@ -5,10 +7,15 @@ export interface AnalysisResult {
   memory: number; // MB
   size: number; // MB (네트워크 전송 총량)
   screenshotPath: string;
-  score: number; // 0~100 (낮을수록 개선 필요)
   status: 'success' | 'error';
   errorMessage?: string;
   analyzedAt: string; // ISO timestamp
+
+  // Objective grades based on threshold table
+  loadTimeGrade: Grade;
+  memoryGrade: Grade;
+  sizeGrade: Grade;
+  priorityScore: number; // 0~9, higher = more urgent to improve
 }
 
 export interface UrlItem {
