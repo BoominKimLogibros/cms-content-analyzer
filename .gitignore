@@ -33,6 +33,12 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local data
+/data/results.json
+
+# screenshots generated during analysis
+/public/screenshots/*
+
 # vercel
 .vercel
 

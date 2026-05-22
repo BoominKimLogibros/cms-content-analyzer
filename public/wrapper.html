@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;">
+  <iframe id="cmsFrame" style="width:100vw;height:100vh;border:none;" />
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUrl = urlParams.get('url');
+    console.log('[Wrapper] Target URL:', targetUrl);
+    
+    if (targetUrl) {
+      document.getElementById('cmsFrame').src = targetUrl;
+    }
+    
+    window.__cmsLoadComplete = false;
+    window.__cmsMessages = [];
+    
+    window.addEventListener('message', function(event) {
+      console.log('[Wrapper] Received message:', event.data);
+      window.__cmsMessages.push(event.data);
+      
+      if (!event.data) return;
+      
+      // Handle LOAD_COMPLETE
+      if (event.data.type === 'LOAD_COMPLETE') {
+        console.log('[Wrapper] LOAD_COMPLETE received!');
+        window.__cmsLoadComplete = true;
+        return;
+      }
+      
+      // Send mock responses back to iframe for common CMS messages
+      const iframe = document.getElementById('cmsFrame');
+      if (!iframe || !iframe.contentWindow) {
+        console.log('[Wrapper] No iframe contentWindow available');
+        return;
+      }
+      
+      const responseMap = {
+        'GET_MISSION_INFO': {
+          type: 'GET_MISSION_INFO',
+          data: {
+            title: 'Mission',
+            objective: '',
+            coinReward: 0,
+            expReward: 0,
+            hint: []
+          }
+        },
+        'GET_SOUND_SETTINGS': {
+          type: 'GET_SOUND_SETTINGS',
+          data: { bgmEnbl: true, sfxEnbl: true }
+        },
+        'GET_GLOBAL_VARIABLE': {
+          type: 'GET_GLOBAL_VARIABLE',
+          data: null
+        },
+        'IS_SHOW_ANSWER': {
+          type: 'IS_SHOW_ANSWER',
+          data: { isShow: false }
+        },
+        'LLM_CONTENT_GET_PREVIOUS_MESSAGES': {
+          type: 'LLM_CONTENT_GET_PREVIOUS_MESSAGES',
+          data: null
+        },
+        'LLM_CONTENT_CREATE_SESSION': {
+          type: 'LLM_CONTENT_CREATE_SESSION',
+          data: 'mock-session-id'
+        },
+        'REPORT_CONTENT_GET_PROMPT_SCORE': {
+          type: 'REPORT_CONTENT_GET_PROMPT_SCORE',
+          data: { score: 100 }
+        }
+      };
+      
+      if (responseMap[event.data.type]) {
+        console.log('[Wrapper] Sending mock response for:', event.data.type);
+        iframe.contentWindow.postMessage(responseMap[event.data.type], '*');
+      }
+    });
+    
+    // Log iframe load events
+    const iframe = document.getElementById('cmsFrame');
+    iframe.addEventListener('load', function() {
+      console.log('[Wrapper] Iframe load event fired');
+    });
+    iframe.addEventListener('error', function(e) {
+      console.log('[Wrapper] Iframe error event:', e);
+    });
+  </script>
+</body>
+</html>

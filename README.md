@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CMS Content Analyzer
 
-## Getting Started
+CMS 컨텐츠의 CDN 로딩 성능을 분석하고 개선 우선순위를 도출하는 도구입니다.
 
-First, run the development server:
+## 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 외부 API에서 CMS 컨텐츠 URL 목록 동기화
+- 체크박스 기반 분석 대상 선택
+- 로딩 시간 / JS 메모리 사용량 / 리소스 다운로드 크기 측정
+- 컨텐츠 스크린샷 자동 캡처
+- 성능 점수화 및 개선 우선순위 정렬
+
+## 시작하기
+
+### 1. 환경 변수 설정
+
+`.env.local` 파일을 생성하고 인증 정보를 입력합니다.
+
+```env
+CMS_ENV=test
+ACCESS_TOKEN=your_token_here
+# 또는
+USER_ID=your_id
+PASSWORD=your_password
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 개발 서버 실행
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. 브라우저에서 접속
 
-## Learn More
+[http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+### 사용 흐름
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **URL 목록 동기화** — 외부 API에서 최신 목록 가져오기
+2. **URL 목록 펼치기** — 분석할 컨텐츠 체크 (전체 선택 / 랜덤 선택 / 개별 선택 가능)
+3. **체크된 항목 제거** — 불필요한 URL 삭제
+4. **분석 시작** — 선택된 URL만 분석 실행
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 기술 스택
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16 + TypeScript
+- Tailwind CSS
+- Playwright (Headless Chromium)
