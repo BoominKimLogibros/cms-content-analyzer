@@ -485,107 +485,132 @@ export default function Dashboard() {
       {results.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4 text-gray-900">분석 결과</h2>
-          <div className="overflow-x-auto rounded-lg border border-gray-200">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+            <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
-                  <th className="py-3 px-4" title="개선이 시급한 순서 (개선 필요도 높은 순)">우선순위</th>
-                  <th className="py-3 px-4">파일명</th>
-                  <th className="py-3 px-4">URL</th>
-                  <th className="py-3 px-4" title="🟢 쾌적: ≤1.8초 / 🟡 중간: 1.8~3.0초 / 🟠 나쁨: 3.0~5.5초 / 🔴 매우 나쁨: >5.5초">로딩 시간</th>
-                  <th className="py-3 px-4" title="🟢 쾌적: ≤50MB / 🟡 중간: 50~100MB / 🟠 나쁨: 100~150MB / 🔴 매우 나쁨: >150MB. 브라우저 전체 V8 Heap이므로 컨텐츠 간 차이가 적을 수 있습니다.">JS 메모리 사용량</th>
-                  <th className="py-3 px-4" title="🟢 쾌적: ≤1.5MB / 🟡 중간: 1.5~3.5MB / 🟠 나쁨: 3.5~6.0MB / 🔴 매우 나쁨: >6.0MB. 페이지 로드 중 전송된 모든 리소스의 누적 바이트입니다.">리소스 다운로드 크기</th>
-                  <th className="py-3 px-4" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급. good=0, moderate=1, poor=2, critical=3.">개선 필요도</th>
-                  <th className="py-3 px-4">상태</th>
-                  <th className="py-3 px-4">스크린샷</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-16" title="개선이 시급한 순서 (개선 필요도 높은 순)">#</th>
+                  <th className="py-3 px-3 text-left whitespace-nowrap min-w-[120px]">파일명</th>
+                  <th className="py-3 px-3 text-left whitespace-nowrap min-w-[240px]">URL</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-28" title="🟢 쾌적: ≤1.8초 / 🟡 중간: 1.8~3.0초 / 🟠 나쁨: 3.0~5.5초 / 🔴 매우 나쁨: >5.5초">로딩 시간</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤50MB / 🟡 중간: 50~100MB / 🟠 나쁨: 100~150MB / 🔴 매우 나쁨: >150MB">JS 메모리</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤1.5MB / 🟡 중간: 1.5~3.5MB / 🟠 나쁨: 3.5~6.0MB / 🔴 매우 나쁨: >6.0MB">다운로드</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-24" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급.">개선 필요도</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-20">상태</th>
+                  <th className="py-3 px-3 text-center whitespace-nowrap w-28">스크린샷</th>
                 </tr>
               </thead>
               <tbody>
                 {results.map((r, idx) => (
                   <tr key={`${r.url}-${idx}`} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900">{idx + 1}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700 font-medium">{r.slug}</td>
-                    <td className="py-3 px-4 text-sm text-gray-500 max-w-xs truncate">
+                    {/* Priority # */}
+                    <td className="py-3 px-3 text-center">
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-xs font-bold tabular-nums">
+                        {idx + 1}
+                      </span>
+                    </td>
+
+                    {/* Slug */}
+                    <td className="py-3 px-3">
+                      <span className="font-medium text-gray-800 truncate block max-w-[140px]" title={r.slug}>
+                        {r.slug}
+                      </span>
+                    </td>
+
+                    {/* URL */}
+                    <td className="py-3 px-3">
                       <a
                         href={r.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                        className="text-blue-600 hover:text-blue-800 hover:underline truncate block max-w-[260px]"
                         title={r.url}
                       >
                         {r.url}
                       </a>
                     </td>
-                    <td className="py-3 px-4">
+
+                    {/* Load Time */}
+                    <td className="py-3 px-3 text-center">
                       {r.status === 'success' ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600 tabular-nums">{r.loadTime.toFixed(2)}초</span>
-                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.loadTimeGrade)}`}>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-gray-800 font-medium tabular-nums">{r.loadTime.toFixed(2)}초</span>
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${getGradeColorClass(r.loadTimeGrade)}`}>
                             {getGradeEmoji(r.loadTimeGrade)} {getGradeLabel(r.loadTimeGrade)}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4">
+
+                    {/* Memory */}
+                    <td className="py-3 px-3 text-center">
                       {r.status === 'success' ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600 tabular-nums">{r.memory.toFixed(1)} MB</span>
-                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.memoryGrade)}`}>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-gray-800 font-medium tabular-nums">{r.memory.toFixed(1)} MB</span>
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${getGradeColorClass(r.memoryGrade)}`}>
                             {getGradeEmoji(r.memoryGrade)} {getGradeLabel(r.memoryGrade)}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4">
+
+                    {/* Size */}
+                    <td className="py-3 px-3 text-center">
                       {r.status === 'success' ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600 tabular-nums">{r.size.toFixed(1)} MB</span>
-                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${getGradeColorClass(r.sizeGrade)}`}>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-gray-800 font-medium tabular-nums">{r.size.toFixed(1)} MB</span>
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${getGradeColorClass(r.sizeGrade)}`}>
                             {getGradeEmoji(r.sizeGrade)} {getGradeLabel(r.sizeGrade)}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4">
+
+                    {/* Priority Score */}
+                    <td className="py-3 px-3 text-center">
                       {r.status === 'success' ? (
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold tabular-nums ${getPriorityColorClass(r.priorityScore)}`}>
+                        <span className={`inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 rounded-lg text-xs font-bold tabular-nums ${getPriorityColorClass(r.priorityScore)}`}>
                           {r.priorityScore}점
                         </span>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-sm">
+
+                    {/* Status */}
+                    <td className="py-3 px-3 text-center">
                       {r.status === 'error' ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-100 text-red-700">
                           실패
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
                           정상
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4">
+
+                    {/* Screenshot */}
+                    <td className="py-3 px-3 text-center">
                       {r.screenshotPath ? (
                         <button
                           onClick={() => setModalImage(r.screenshotPath)}
-                          className="p-0 border-0 bg-transparent cursor-pointer"
+                          className="p-0 border-0 bg-transparent cursor-pointer inline-block"
                         >
                           <img
                             src={r.screenshotPath}
                             alt={r.slug}
-                            className="w-32 h-20 object-cover rounded border border-gray-200 hover:opacity-80 transition-opacity"
+                            className="w-24 h-14 object-cover rounded-lg border border-gray-200 hover:opacity-80 hover:shadow-md transition-all"
                           />
                         </button>
                       ) : (
-                        <span className="text-gray-400 text-sm">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
                   </tr>

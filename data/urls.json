@@ -1,7 +1,7 @@
 [
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/example/mission1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/example/mission2.html",
@@ -9,7 +9,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-draw/mission1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/rpg-game/index.html",
@@ -89,7 +89,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-canva/MAI03H_1_1_2.html",
-    "checked": true
+    "checked": false
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-canva/MAI05H_1_1_1.html",
@@ -245,7 +245,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-smart-energy/AI_SMART_ENERGY_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-smart-energy/AI_SMART_ENERGY_3.html",
@@ -253,7 +253,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-smart-energy/AI_SMART_ENERGY_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/multi-objects-pathfinder/LCS16_1_1_2.html",
@@ -297,7 +297,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/multi-objects-pathfinder/LCS16_1_S_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/multi-objects-pathfinder/LCS16_1_S_3.html",
@@ -405,7 +405,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS02E_1_3_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS02E_1_S_1.html",
@@ -513,7 +513,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS11E_1_S_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS11E_2_1_2.html",
@@ -553,7 +553,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS11E_2_S_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS12E_1_1_2.html",
@@ -601,7 +601,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS12E_2_1_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCS12E_2_1_4.html",
@@ -749,7 +749,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS01_1_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS01_1_1_3.html",
@@ -885,7 +885,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS01_1_3_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS01_1_3_3.html",
@@ -973,7 +973,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_1_8.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_1_9.html",
@@ -1029,7 +1029,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_2_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_2_6.html",
@@ -1053,7 +1053,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_3_10.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS02_1_3_11.html",
@@ -1161,7 +1161,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS03_1_1_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS03_1_1_6.html",
@@ -1177,7 +1177,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS03_1_1_9.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS03_1_2_1.html",
@@ -1313,7 +1313,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS03_1_3_9.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS04_1_1_1.html",
@@ -1365,7 +1365,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS04_1_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pathfinder/LCSS04_1_2_3.html",
@@ -1513,7 +1513,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-privacy-security/AI12_1_1_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/AI10H_1_2_1.html",
@@ -1533,7 +1533,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/AI13H_1_2_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/AI17H_1_2_1.html",
@@ -1593,7 +1593,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/DA01H_1_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/DA02H_1_2_1.html",
@@ -1681,7 +1681,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/LCS16H_1_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/canva/LCT00H_1_2_1.html",
@@ -1813,7 +1813,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-cinderella-who/FT02_3_1_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-cinderella-who/FT02_6_1_1.html",
@@ -1885,7 +1885,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-cleaning/FT02_5_1_2.html",
-    "checked": true
+    "checked": false
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-cleaning/FT02_5_1_20.html",
@@ -1949,7 +1949,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-cut-tree/FT03_6_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-down-item/FT01_1_1_5.html",
@@ -2029,7 +2029,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-down-item/FT04_5_1_21.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-down-item/FT04_5_1_3.html",
@@ -2313,7 +2313,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT03_5_1_12.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT03_5_1_13.html",
@@ -2353,11 +2353,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT03_5_1_21.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT03_5_1_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT03_5_1_4.html",
@@ -2389,7 +2389,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT05_1_1_3.html",
-    "checked": true
+    "checked": false
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid/FT05_1_1_4.html",
@@ -2529,11 +2529,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT02_4_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT02_4_1_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT02_4_1_4.html",
@@ -2545,7 +2545,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT04_3_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT04_3_1_3.html",
@@ -2581,7 +2581,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT08_1_1_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-grid-with-wall/FT08_1_1_5.html",
@@ -2777,11 +2777,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-link-ivy/FT08_3_1_6.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-link-ivy/FT08_6_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-link-ivy/FT08_6_1_10.html",
@@ -2933,7 +2933,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-pirate/FT07_6_1_20.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-pirate/FT07_6_1_21.html",
@@ -3009,7 +3009,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-push-rock/FT05_4_1_6.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-puzzle/FT06_4_1_2.html",
@@ -3041,7 +3041,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-rice-collection/FT08_1_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-shadow/FT07_1_1_2.html",
@@ -3073,7 +3073,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-wear-clothes/FT02_2_1_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/como-wear-clothes/FT02_2_1_4.html",
@@ -3233,7 +3233,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/delicious-market/LCSS06_1_3_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/delicious-market/LCSS06_1_3_6.html",
@@ -3293,7 +3293,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/dialog/AI17H_1_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/dialog/AI18H_1_1_1.html",
@@ -3329,7 +3329,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/dialog/DL01H_1_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/dialog/LCS00H_1_1_1.html",
@@ -3393,7 +3393,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/digital-literacy-keyboard-learn/DL02_1_1_6.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/digital-literacy-keyboard-learn/DL02_1_1_7.html",
@@ -3417,7 +3417,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/digital-literacy-keyboard-learn/DL02_1_2_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/digital-literacy-keyboard-learn/DL02_1_S_1.html",
@@ -3521,7 +3521,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/findout-personal-info/DC01_1_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/findout-personal-info/DC01_1_1_3.html",
@@ -3709,7 +3709,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/function-plant/LCS15_2_2_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/function-plant/LCS15_2_2_4.html",
@@ -3773,7 +3773,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCT03_1_3_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCT03_1_S_1.html",
@@ -3789,7 +3789,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCT03_2_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCT03_2_1_3.html",
@@ -3869,7 +3869,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCTS05_1_2_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCTS05_1_2_4.html",
@@ -3945,7 +3945,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCTS05_1_6_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/marble/LCTS05_1_6_3.html",
@@ -4033,7 +4033,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-cafe-kiosk/LCS03E_2_S_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-cafe-kiosk/LCS03E_2_S_4.html",
@@ -4061,7 +4061,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-cafe-kiosk/LCSS05_1_1_6.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-cafe-kiosk/LCSS05_1_1_7.html",
@@ -4201,7 +4201,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCT06_1_2_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCT06_1_2_6.html",
@@ -4209,7 +4209,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCT06_1_S_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCT06_1_S_2.html",
@@ -4305,7 +4305,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCTS08_1_2_14.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-click-card/LCTS08_1_2_2.html",
@@ -4445,7 +4445,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_2_10.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_2_2.html",
@@ -4489,7 +4489,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_3_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_3_3.html",
@@ -4513,7 +4513,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_3_8.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-ladder/LCTS04_1_3_9.html",
@@ -4585,7 +4585,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-laser/LCTS02_1_1_14.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-laser/LCTS02_1_1_15.html",
@@ -4717,7 +4717,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-laser/LCTS02_1_3_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-laser/LCTS02_1_3_10.html",
@@ -4865,7 +4865,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moss/LCT01_1_2_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moss/LCT01_1_S_3.html",
@@ -5021,7 +5021,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCT05_1_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCT05_1_2_3.html",
@@ -5081,7 +5081,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCT05_2_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCT05_2_2_3.html",
@@ -5117,7 +5117,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCT05_2_S_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCTS07_1_1_1.html",
@@ -5157,7 +5157,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCTS07_1_2_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-moving-walk/LCTS07_1_2_4.html",
@@ -5305,7 +5305,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_1_14.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_1_15.html",
@@ -5333,7 +5333,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_1_20.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_1_3.html",
@@ -5417,7 +5417,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_2_8.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_2_9.html",
@@ -5461,7 +5461,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_3_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-pipe/LCTS01_1_3_5.html",
@@ -5493,7 +5493,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-push-box/LCT04_1_2_4.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-push-box/LCT04_1_S_3.html",
@@ -5541,7 +5541,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCT04_2_2_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCT04_2_2_3.html",
@@ -5549,11 +5549,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCT04_2_S_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCT04_2_S_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCT04_2_S_3.html",
@@ -5589,7 +5589,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCTS06_1_1_7.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/new-volta-runner/LCTS06_1_1_8.html",
@@ -5837,7 +5837,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pattern-factory/LCT06_2_S_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pattern-factory/LCT06_2_S_3.html",
@@ -5857,7 +5857,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pattern-factory/LCTS09_1_1_11.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/pattern-factory/LCTS09_1_1_12.html",
@@ -6009,7 +6009,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/python-pathfinder/TLCS01_2_1_2.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/python-pathfinder/TLCS01_2_1_3.html",
@@ -6257,7 +6257,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/space/MAK03_1_4_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/space/MAK03_1_4_2.html",
@@ -6369,11 +6369,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/space-dc-fighter/MAK05_1_3_3.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/space-dc-fighter/MAK05_1_4_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/space-dc-fighter/MAK05_1_4_2.html",
@@ -6525,7 +6525,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/FT01_3_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/FT01_4_1_1.html",
@@ -6693,15 +6693,15 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS02E_2_3_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS02E_2_3_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS03E_1_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS03E_1_2_1.html",
@@ -6769,7 +6769,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS13E_2_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS13E_2_2_1.html",
@@ -6797,7 +6797,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS14_2_2_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCS15_1_1_1.html",
@@ -6853,7 +6853,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCT02_1_2_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCT02_2_1_1.html",
@@ -6921,7 +6921,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCT06_2_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/LCT06_2_2_7.html",
@@ -6945,11 +6945,11 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/TLCS01_2_2_5.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/TLCS02_1_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/story/TLCS02_1_2_1.html",
@@ -7093,7 +7093,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-levelup/PROMPT_9.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/ai-levelup/PROMPT_BONUS.html",
@@ -7169,7 +7169,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/organize/DA02H_1_3_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/organize/DC01H_1_3_1.html",
@@ -7201,7 +7201,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/organize/LCS12H_1_3_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/organize/LCS13H_1_3_1.html",
@@ -7349,7 +7349,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/goblin-kingdom/DL11_1_1_1.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/who-to-save/AI11_1_1_1.html",
@@ -7393,7 +7393,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E010101_010.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E010202_001.html",
@@ -7409,7 +7409,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E010202_004.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E010202_005.html",
@@ -7489,7 +7489,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020101_002.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020101_003.html",
@@ -7525,7 +7525,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020204_002.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020204_003.html",
@@ -7549,7 +7549,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E030101_004.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E030101_005.html",
@@ -7569,7 +7569,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E030102_003.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E030102_004.html",
@@ -7805,7 +7805,7 @@
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020101_INTERMEDIATE.html",
-    "checked": false
+    "checked": true
   },
   {
     "url": "https://v2.cdn.test.codmos.io/auth/common/cms/content/aidt/E020101_BEGINNER.html",
