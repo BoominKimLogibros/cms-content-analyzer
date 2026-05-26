@@ -1,8 +1,47 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { AnalysisResult, UrlItem, UrlListResponse, AnalyzeResponse } from '@/types';
 import { getGradeEmoji, getGradeLabel, getGradeColorClass, getPriorityColorClass } from '@/lib/scoring';
+
+type SortKey = 'slug' | 'url' | 'loadTime' | 'memory' | 'size' | 'priorityScore' | 'status';
+type SortDirection = 'asc' | 'desc';
+type ResultSort = { key: SortKey; direction: SortDirection };
+
+interface SortHeaderProps {
+  sortKey: SortKey;
+  currentSort: ResultSort;
+  onSort: (key: SortKey) => void;
+  children: ReactNode;
+  className: string;
+  title?: string;
+  align?: 'left' | 'center';
+}
+
+interface SseProgressData {
+  current: number;
+  total: number;
+  percentage: number;
+}
+
+interface SseCompleteData {
+  results: AnalysisResult[];
+  totalCount: number;
+  successCount: number;
+  failCount: number;
+}
+
+interface SseMessageData {
+  message?: string;
+  current?: number;
+  total?: number;
+  percentage?: number;
+  results?: AnalysisResult[];
+  totalCount?: number;
+  successCount?: number;
+  failCount?: number;
+}
 
 function estimateDuration(urlCount: number): string {
   if (urlCount <= 0) return '0초';
@@ -14,6 +53,66 @@ function estimateDuration(urlCount: number): string {
   return rem > 0 ? `약 ${minutes}분 ${rem}초` : `약 ${minutes}분`;
 }
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function isProgressData(data: SseMessageData): data is SseProgressData {
+  return (
+    typeof data.current === 'number' &&
+    typeof data.total === 'number' &&
+    typeof data.percentage === 'number'
+  );
+}
+
+function isCompleteData(data: SseMessageData): data is SseCompleteData {
+  return (
+    Array.isArray(data.results) &&
+    typeof data.totalCount === 'number' &&
+    typeof data.successCount === 'number' &&
+    typeof data.failCount === 'number'
+  );
+}
+
+function SortHeader({
+  sortKey,
+  currentSort,
+  onSort,
+  children,
+  className,
+  title,
+  align = 'center',
+}: SortHeaderProps) {
+  const isActive = currentSort.key === sortKey;
+  const sortLabel = isActive ? (currentSort.direction === 'asc' ? '오름차순' : '내림차순') : '정렬';
+  const justifyClass = align === 'left' ? 'justify-start' : 'justify-center';
+
+  return (
+    <th className={className} title={title}>
+      <button
+        type="button"
+        onClick={() => onSort(sortKey)}
+        className={`inline-flex w-full items-center ${justifyClass} gap-1.5 rounded px-1 py-1 text-inherit hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        aria-label={`${String(children)} ${sortLabel}`}
+      >
+        <span>{children}</span>
+        <svg
+          className={`h-3.5 w-3.5 transition-colors ${isActive ? 'text-gray-800' : 'text-gray-300'}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          {isActive && currentSort.direction === 'desc' ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          )}
+        </svg>
+      </button>
+    </th>
+  );
+}
+
 export default function Dashboard() {
   const [urlItems, setUrlItems] = useState<UrlItem[]>([]);
   const [results, setResults] = useState<AnalysisResult[]>([]);
@@ -23,12 +122,15 @@ export default function Dashboard() {
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [showUrlList, setShowUrlList] = useState(false);
   const [randomCount, setRandomCount] = useState<number>(10);
+  const [resultSort, setResultSort] = useState<ResultSort>({
+    key: 'priorityScore',
+    direction: 'desc',
+  });
 
   // Streaming analysis state
   const [progress, setProgress] = useState<{ current: number; total: number; percentage: number } | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [eta, setEta] = useState<string>('');
-  const [streamingResults, setStreamingResults] = useState<AnalysisResult[]>([]);
 
   // Per-row re-analysis state
   const [reanalyzingUrls, setReanalyzingUrls] = useState<Set<string>>(new Set());
@@ -132,8 +234,8 @@ export default function Dashboard() {
       } else {
         setMessage(`동기화 실패: ${data.message}`);
       }
-    } catch (err: any) {
-      setMessage(`동기화 오류: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`동기화 오류: ${getErrorMessage(err)}`);
     } finally {
       setLoadingSync(false);
     }
@@ -150,7 +252,6 @@ export default function Dashboard() {
     setProgress(null);
     setLogs([]);
     setEta('');
-    setStreamingResults([]);
 
     const startTime = Date.now();
     const urls = checkedItems.map((u) => u.url);
@@ -203,19 +304,19 @@ export default function Dashboard() {
           if (!eventType || !dataStr) continue;
 
           try {
-            const data = JSON.parse(dataStr);
+            const data = JSON.parse(dataStr) as SseMessageData;
 
             switch (eventType) {
               case 'log': {
-                setLogs((prev) => [...prev, data.message]);
+                const logMessage = data.message;
+                if (logMessage) {
+                  setLogs((prev) => [...prev, logMessage]);
+                }
                 break;
               }
               case 'progress': {
-                setProgress({
-                  current: data.current,
-                  total: data.total,
-                  percentage: data.percentage,
-                });
+                if (!isProgressData(data)) break;
+                setProgress(data);
                 // Calculate ETA
                 const elapsed = (Date.now() - startTime) / 1000;
                 const avgPerItem = elapsed / data.current;
@@ -234,8 +335,8 @@ export default function Dashboard() {
                 break;
               }
               case 'complete': {
+                if (!isCompleteData(data)) break;
                 setResults(data.results);
-                setStreamingResults(data.results);
                 setMessage(
                   `${data.totalCount}개 분석 완료 (성공 ${data.successCount}개, 실패 ${data.failCount}개)`
                 );
@@ -244,7 +345,7 @@ export default function Dashboard() {
                 break;
               }
               case 'error': {
-                setMessage(`분석 오류: ${data.message}`);
+                setMessage(`분석 오류: ${data.message || '알 수 없는 오류'}`);
                 setEta('');
                 setProgress(null);
                 break;
@@ -255,8 +356,8 @@ export default function Dashboard() {
           }
         }
       }
-    } catch (err: any) {
-      setMessage(`분석 오류: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`분석 오류: ${getErrorMessage(err)}`);
     } finally {
       setLoadingAnalyze(false);
     }
@@ -304,20 +405,21 @@ export default function Dashboard() {
           if (!eventType || !dataStr) continue;
 
           try {
-            const data = JSON.parse(dataStr);
+            const data = JSON.parse(dataStr) as SseMessageData;
             if (eventType === 'complete') {
+              if (!isCompleteData(data)) continue;
               setResults(data.results);
               setMessage(`"${url.split('/').pop()}" 재분석 완료`);
             } else if (eventType === 'error') {
-              setMessage(`재분석 오류: ${data.message}`);
+              setMessage(`재분석 오류: ${data.message || '알 수 없는 오류'}`);
             }
           } catch {
             // ignore
           }
         }
       }
-    } catch (err: any) {
-      setMessage(`재분석 오류: ${err.message}`);
+    } catch (err: unknown) {
+      setMessage(`재분석 오류: ${getErrorMessage(err)}`);
     } finally {
       setReanalyzingUrls((prev) => {
         const next = new Set(prev);
@@ -331,6 +433,38 @@ export default function Dashboard() {
 
   const hasUrls = totalCount > 0;
   const allChecked = hasUrls && urlItems.every((u) => u.checked);
+
+  const sortedResults = useMemo(() => {
+    const directionMultiplier = resultSort.direction === 'asc' ? 1 : -1;
+
+    return results
+      .map((result, index) => ({ result, index }))
+      .sort((a, b) => {
+        const aValue = a.result[resultSort.key];
+        const bValue = b.result[resultSort.key];
+        let comparison = 0;
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          comparison = aValue - bValue;
+        } else {
+          comparison = String(aValue).localeCompare(String(bValue), 'ko', {
+            numeric: true,
+            sensitivity: 'base',
+          });
+        }
+
+        if (comparison === 0) return a.index - b.index;
+        return comparison * directionMultiplier;
+      })
+      .map(({ result }) => result);
+  }, [results, resultSort]);
+
+  function toggleResultSort(key: SortKey) {
+    setResultSort((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -539,8 +673,9 @@ export default function Dashboard() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                        className="text-blue-600 hover:text-blue-800 hover:underline block truncate text-left"
                         title={item.url}
+                        style={{ direction: 'rtl' }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {item.url}
@@ -563,20 +698,30 @@ export default function Dashboard() {
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
                   <th className="py-3 px-3 text-center whitespace-nowrap w-16" title="개선이 시급한 순서 (개선 필요도 높은 순)">#</th>
-                  <th className="py-3 px-3 text-left whitespace-nowrap min-w-[120px]">파일명</th>
-                  <th className="py-3 px-3 text-left whitespace-nowrap min-w-[240px]">URL</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-28" title="🟢 쾌적: ≤1.8초 / 🟡 중간: 1.8~3.0초 / 🟠 나쁨: 3.0~5.5초 / 🔴 매우 나쁨: >5.5초">로딩 시간</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤50MB / 🟡 중간: 50~100MB / 🟠 나쁨: 100~150MB / 🔴 매우 나쁨: >150MB">JS 메모리</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤1.5MB / 🟡 중간: 1.5~3.5MB / 🟠 나쁨: 3.5~6.0MB / 🔴 매우 나쁨: >6.0MB">다운로드</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-24" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급.">개선 필요도</th>
-                  <th className="py-3 px-3 text-center whitespace-nowrap w-20">상태</th>
+                  <SortHeader sortKey="slug" currentSort={resultSort} onSort={toggleResultSort} align="left" className="py-3 px-3 text-left whitespace-nowrap min-w-[120px]">파일명</SortHeader>
+                  <SortHeader sortKey="url" currentSort={resultSort} onSort={toggleResultSort} align="left" className="py-3 px-3 text-left whitespace-nowrap min-w-[240px]">URL</SortHeader>
+                  <SortHeader sortKey="loadTime" currentSort={resultSort} onSort={toggleResultSort} className="py-3 px-3 text-center whitespace-nowrap w-28" title="🟢 쾌적: ≤1.8초 / 🟡 중간: 1.8~3.0초 / 🟠 나쁨: 3.0~5.5초 / 🔴 매우 나쁨: >5.5초">로딩 시간</SortHeader>
+                  <SortHeader sortKey="memory" currentSort={resultSort} onSort={toggleResultSort} className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤50MB / 🟡 중간: 50~100MB / 🟠 나쁨: 100~150MB / 🔴 매우 나쁨: >150MB">JS 메모리</SortHeader>
+                  <SortHeader sortKey="size" currentSort={resultSort} onSort={toggleResultSort} className="py-3 px-3 text-center whitespace-nowrap w-32" title="🟢 쾌적: ≤1.5MB / 🟡 중간: 1.5~3.5MB / 🟠 나쁨: 3.5~6.0MB / 🔴 매우 나쁨: >6.0MB">다운로드</SortHeader>
+                  <SortHeader sortKey="priorityScore" currentSort={resultSort} onSort={toggleResultSort} className="py-3 px-3 text-center whitespace-nowrap w-24" title="3가지 지표의 등급 점수 합계 (0~9). 높을수록 개선이 시급.">개선 필요도</SortHeader>
+                  <SortHeader sortKey="status" currentSort={resultSort} onSort={toggleResultSort} className="py-3 px-3 text-center whitespace-nowrap w-20">상태</SortHeader>
                   <th className="py-3 px-3 text-center whitespace-nowrap w-28">스크린샷</th>
                   <th className="py-3 px-3 text-center whitespace-nowrap w-24">액션</th>
                 </tr>
               </thead>
               <tbody>
-                {results.map((r, idx) => (
-                  <tr key={`${r.url}-${idx}`} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                {sortedResults.map((r, idx) => {
+                  const isReanalyzing = reanalyzingUrls.has(r.url);
+
+                  return (
+                  <tr
+                    key={`${r.url}-${idx}`}
+                    className={`border-b transition-colors ${
+                      isReanalyzing
+                        ? 'border-blue-200 bg-blue-50 shadow-[inset_4px_0_0_#2563eb]'
+                        : 'border-gray-100 hover:bg-gray-50'
+                    }`}
+                  >
                     {/* Priority # */}
                     <td className="py-3 px-3 text-center">
                       <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-xs font-bold tabular-nums">
@@ -599,6 +744,7 @@ export default function Dashboard() {
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 hover:underline truncate block max-w-[260px]"
                         title={r.url}
+                        style={{ direction: 'rtl' }}
                       >
                         {r.url}
                       </a>
@@ -722,7 +868,8 @@ export default function Dashboard() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
