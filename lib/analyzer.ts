@@ -10,6 +10,8 @@ const USER_ID = process.env.USER_ID || '';
 const PASSWORD = process.env.PASSWORD || '';
 
 const CONCURRENCY = 5;
+const NETWORK_QUIET_MS = 1000;
+const NETWORK_MAX_WAIT_MS = 10000;
 
 const API_BASE = {
   test: 'https://v2.api.test.codmos.io',
@@ -27,6 +29,14 @@ interface CookieSpec {
   domain: string;
 }
 
+interface LoginResponse {
+  code?: string;
+  message?: string;
+  data?: {
+    accessToken?: string;
+  };
+}
+
 function parseSetCookieHeader(header: string): CookieSpec | null {
   const parts = header.split(';');
   const [nameValue] = parts;
@@ -40,6 +50,10 @@ function parseSetCookieHeader(header: string): CookieSpec | null {
   const domain = domainMatch ? domainMatch[1].trim() : '';
 
   return { name, value, domain };
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function getAuthCookies(targetCdnDomain: string): Promise<CookieSpec[]> {
@@ -71,7 +85,7 @@ async function getAuthCookies(targetCdnDomain: string): Promise<CookieSpec[]> {
 
       const setCookieHeaders: string[] = [];
       try {
-        const rawCookies = (response.headers as any).getSetCookie?.();
+        const rawCookies = response.headers.getSetCookie();
         if (Array.isArray(rawCookies)) {
           setCookieHeaders.push(...rawCookies);
         }
@@ -90,7 +104,7 @@ async function getAuthCookies(targetCdnDomain: string): Promise<CookieSpec[]> {
         }
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as LoginResponse;
       console.log(`[Auth] Login response code: ${data.code}, message: ${data.message || 'N/A'}`);
 
       if (data.code === '1000' && data.data?.accessToken) {
@@ -103,8 +117,8 @@ async function getAuthCookies(targetCdnDomain: string): Promise<CookieSpec[]> {
       } else {
         console.error(`[Auth] Login API returned error: ${data.message || 'Unknown'}`);
       }
-    } catch (err: any) {
-      console.error(`[Auth] Login request failed: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(`[Auth] Login request failed: ${getErrorMessage(err)}`);
     }
   }
 
@@ -135,6 +149,46 @@ interface AnalysisCallbacks {
   onLog?: (message: string) => void;
 }
 
+interface NetworkRequestInfo {
+  encodedDataLength: number;
+  fromCache: boolean;
+  failed: boolean;
+}
+
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize?: number;
+  };
+}
+
+function sumDownloadedBytes(requests: Map<string, NetworkRequestInfo>): number {
+  let total = 0;
+
+  for (const request of requests.values()) {
+    if (!request.failed && !request.fromCache) {
+      total += request.encodedDataLength;
+    }
+  }
+
+  return total;
+}
+
+async function waitForNetworkQuiet(inflightRequestIds: Set<string>) {
+  const startedAt = Date.now();
+  let quietSince = inflightRequestIds.size === 0 ? Date.now() : 0;
+
+  while (Date.now() - startedAt < NETWORK_MAX_WAIT_MS) {
+    if (inflightRequestIds.size === 0) {
+      if (quietSince === 0) quietSince = Date.now();
+      if (Date.now() - quietSince >= NETWORK_QUIET_MS) return;
+    } else {
+      quietSince = 0;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+}
+
 async function analyzeSingleUrl(
   url: string,
   timestamp: string,
@@ -159,7 +213,9 @@ async function analyzeSingleUrl(
   const browser = await chromium.launch({ headless: true });
 
   try {
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      serviceWorkers: 'block',
+    });
 
     if (authCookies.length > 0) {
       const cookieDomain = new URL(url).hostname;
@@ -187,15 +243,61 @@ async function analyzeSingleUrl(
     });
 
     try {
-      // Enable CDP Network tracking for resource sizes
+      // Enable CDP Network tracking for deterministic resource transfer sizes.
       const client = await page.context().newCDPSession(page);
       await client.send('Network.enable');
-      let totalEncodedLength = 0;
+      await client.send('Network.setCacheDisabled', { cacheDisabled: true });
 
-      let sizeCaptured = false;
-      client.on('Network.loadingFinished', (params: { encodedDataLength: number }) => {
-        if (sizeCaptured) return;
-        totalEncodedLength += params.encodedDataLength;
+      const networkRequests = new Map<string, NetworkRequestInfo>();
+      const inflightRequestIds = new Set<string>();
+
+      client.on('Network.requestWillBeSent', (params: { requestId: string }) => {
+        inflightRequestIds.add(params.requestId);
+        if (!networkRequests.has(params.requestId)) {
+          networkRequests.set(params.requestId, {
+            encodedDataLength: 0,
+            fromCache: false,
+            failed: false,
+          });
+        }
+      });
+
+      client.on('Network.requestServedFromCache', (params: { requestId: string }) => {
+        const request = networkRequests.get(params.requestId);
+        if (request) request.fromCache = true;
+      });
+
+      client.on(
+        'Network.responseReceived',
+        (params: {
+          requestId: string;
+          response: {
+            fromDiskCache?: boolean;
+            fromPrefetchCache?: boolean;
+            fromServiceWorker?: boolean;
+          };
+        }) => {
+          const request = networkRequests.get(params.requestId);
+          if (!request) return;
+
+          request.fromCache = Boolean(
+            params.response.fromDiskCache ||
+            params.response.fromPrefetchCache ||
+            params.response.fromServiceWorker
+          );
+        }
+      );
+
+      client.on('Network.loadingFinished', (params: { requestId: string; encodedDataLength: number }) => {
+        const request = networkRequests.get(params.requestId);
+        if (request) request.encodedDataLength = params.encodedDataLength;
+        inflightRequestIds.delete(params.requestId);
+      });
+
+      client.on('Network.loadingFailed', (params: { requestId: string }) => {
+        const request = networkRequests.get(params.requestId);
+        if (request) request.failed = true;
+        inflightRequestIds.delete(params.requestId);
       });
 
       const startTime = Date.now();
@@ -239,18 +341,16 @@ async function analyzeSingleUrl(
         await page.waitForTimeout(1500);
       }
 
-      // ── FIX: capture network size at load time, BEFORE fullPage screenshot triggers lazy-image loads ──
-      // fullPage=true screenshot scrolls to the bottom and forces lazy images to download,
-      // inflating the total. We freeze the count right after the page load completes.
-      await page.waitForTimeout(500);
-      sizeCaptured = true;
-      const sizeAtLoad = totalEncodedLength;
+      // Capture only after the measured page has become network-quiet. This avoids
+      // freezing the byte count while late image/font/script requests are still in flight.
+      await waitForNetworkQuiet(inflightRequestIds);
+      const sizeAtLoad = sumDownloadedBytes(networkRequests);
 
       // Memory (Chromium specific)
       const memoryUsed = await page.evaluate(() => {
         try {
-          const mem = (performance as any).memory;
-          if (mem) return mem.usedJSHeapSize as number;
+          const mem = (performance as PerformanceWithMemory).memory;
+          if (mem?.usedJSHeapSize) return mem.usedJSHeapSize;
         } catch {
           // ignore
         }
@@ -263,7 +363,7 @@ async function analyzeSingleUrl(
 
       // Screenshot (full page)
       await page.screenshot({ path: screenshotFilePath, fullPage: true });
-      log(`[Analyzer] Screenshot saved for ${slug} (loadTime: ${loadTime.toFixed(1)}s, memory: ${memoryMB.toFixed(1)}MB, size: ${sizeMB.toFixed(1)}MB)`);
+      log(`[Analyzer] Screenshot saved for ${slug} (loadTime: ${loadTime.toFixed(1)}s, memory: ${memoryMB.toFixed(1)}MB, size: ${sizeMB.toFixed(3)}MB, requests: ${networkRequests.size})`);
 
       return {
         url,
@@ -281,8 +381,9 @@ async function analyzeSingleUrl(
         priorityScore: 0,
         logs: urlLogs,
       };
-    } catch (err: any) {
-      log(`[Analyzer] Error analyzing ${slug}: ${err.message}`);
+    } catch (err: unknown) {
+      const errorMessage = getErrorMessage(err);
+      log(`[Analyzer] Error analyzing ${slug}: ${errorMessage}`);
       return {
         url,
         slug,
@@ -291,7 +392,7 @@ async function analyzeSingleUrl(
         size: 0,
         screenshotPath: '',
         status: 'error',
-        errorMessage: err.message,
+        errorMessage,
         analyzedAt: timestamp,
         loadTimeGrade: 'critical' as const,
         memoryGrade: 'critical' as const,
