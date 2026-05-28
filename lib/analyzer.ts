@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium, type Page } from 'playwright';
 import path from 'path';
 import pLimit from 'p-limit';
 import { AnalysisResult } from '@/types';
@@ -50,6 +50,22 @@ function parseSetCookieHeader(header: string): CookieSpec | null {
   const domain = domainMatch ? domainMatch[1].trim() : '';
 
   return { name, value, domain };
+}
+
+function normalizeCookieDomain(domain: string): string {
+  return domain.replace(/^\./, '').toLowerCase();
+}
+
+function isCookieApplicableToDomain(cookie: CookieSpec, targetDomain: string): boolean {
+  if (!cookie.value) return false;
+
+  const normalizedCookieDomain = normalizeCookieDomain(cookie.domain);
+  const normalizedTargetDomain = normalizeCookieDomain(targetDomain);
+
+  return (
+    normalizedCookieDomain === normalizedTargetDomain ||
+    normalizedTargetDomain.endsWith(`.${normalizedCookieDomain}`)
+  );
 }
 
 function getErrorMessage(error: unknown): string {
@@ -122,16 +138,18 @@ async function getAuthCookies(targetCdnDomain: string): Promise<CookieSpec[]> {
     }
   }
 
-  if (cookies.length === 0) {
+  const targetDomainCookies = cookies.filter((cookie) => isCookieApplicableToDomain(cookie, targetCdnDomain));
+
+  if (targetDomainCookies.length === 0) {
     console.warn('[Auth] No authentication cookies obtained. Set ACCESS_TOKEN or USER_ID+PASSWORD in .env.local');
   } else {
-    console.log(`[Auth] Total cookies to set: ${cookies.length}`);
-    for (const c of cookies) {
+    console.log(`[Auth] Total cookies to set: ${targetDomainCookies.length}`);
+    for (const c of targetDomainCookies) {
       console.log(`[Auth] Cookie: name=${c.name}, domain=${c.domain}, value_len=${c.value.length}`);
     }
   }
 
-  return cookies;
+  return targetDomainCookies;
 }
 
 function getSlug(url: string): string {
@@ -187,6 +205,25 @@ async function waitForNetworkQuiet(inflightRequestIds: Set<string>) {
 
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
+}
+
+async function isMissingKeyPairCookieErrorPage(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    const code = document.getElementsByTagName('Code')[0]?.textContent?.trim() || '';
+    const message = document.getElementsByTagName('Message')[0]?.textContent?.trim() || '';
+    const pageText = [
+      document.documentElement?.textContent,
+      document.body?.innerText,
+    ].filter(Boolean).join(' ');
+
+    return (
+      code === 'MissingKey' &&
+      /Missing Key-Pair-Id query parameter or cookie value/i.test(message)
+    ) || (
+      /MissingKey/i.test(pageText) &&
+      /Missing Key-Pair-Id query parameter or cookie value/i.test(pageText)
+    );
+  });
 }
 
 async function analyzeSingleUrl(
@@ -360,10 +397,33 @@ async function analyzeSingleUrl(
 
       // Size: use the captured-at-load value, not the post-screenshot accumulated value
       const sizeMB = sizeAtLoad / (1024 * 1024);
+      const hasMissingKeyPairCookieError = await isMissingKeyPairCookieErrorPage(page);
 
       // Screenshot (full page)
       await page.screenshot({ path: screenshotFilePath, fullPage: true });
       log(`[Analyzer] Screenshot saved for ${slug} (loadTime: ${loadTime.toFixed(1)}s, memory: ${memoryMB.toFixed(1)}MB, size: ${sizeMB.toFixed(3)}MB, requests: ${networkRequests.size})`);
+
+      if (hasMissingKeyPairCookieError) {
+        const errorMessage = 'CloudFront authentication failed: Missing Key-Pair-Id query parameter or cookie value';
+        log(`[Analyzer] ${errorMessage}`);
+
+        return {
+          url,
+          slug,
+          loadTime,
+          memory: memoryMB,
+          size: sizeMB,
+          screenshotPath: publicPath,
+          status: 'error',
+          errorMessage,
+          analyzedAt: timestamp,
+          loadTimeGrade: 'critical' as const,
+          memoryGrade: 'critical' as const,
+          sizeGrade: 'critical' as const,
+          priorityScore: 9,
+          logs: urlLogs,
+        };
+      }
 
       return {
         url,
